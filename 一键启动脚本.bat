@@ -4,7 +4,7 @@ pushd %~dp0
 :: 参考原版：生产模式启动，更稳定、省内存
 set NODE_ENV=production
 chcp 65001 >nul
-title 宝宝专属 · 酒馆一键安装+启动+智能FRP
+title 酒馆一键安装+启动+智能FRP
 
 echo.
 echo ==============================================
@@ -50,11 +50,21 @@ if exist frpc.exe (
     echo 提示：未找到 frpc.exe，跳过内网穿透（仅启动本地酒馆）
 )
 
+:: 从 frpc.ini 动态读取外网地址和端口
+set SERVER_ADDR=未配置
+set REMOTE_PORT=未配置
+if exist frpc.ini (
+    for /f "tokens=2 delims==" %%a in ('findstr "server_addr" frpc.ini') do set SERVER_ADDR=%%a
+    for /f "tokens=2 delims==" %%b in ('findstr "remote_port" frpc.ini') do set REMOTE_PORT=%%b
+    set SERVER_ADDR=%SERVER_ADDR: =%
+    set REMOTE_PORT=%REMOTE_PORT: =%
+)
+
 echo.
 echo ==============================
 echo  启动完成！
 echo  本地访问：http://127.0.0.1:8000
-echo  外网访问：http://43.167.209.77:8080（如已配置FRP）
+echo  外网访问：http://%SERVER_ADDR%:%REMOTE_PORT%（如已配置FRP）
 echo ==============================
 echo.
 pause
